@@ -23,6 +23,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.BufferedOutputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.StringWriter;
+
+import org.apache.ignite.Ignite;
+import org.apache.ignite.Ignition;
 
 public class AppFrame extends Frame implements ActionListener, ItemListener {
 
@@ -30,9 +37,9 @@ public class AppFrame extends Frame implements ActionListener, ItemListener {
 	Checkbox get, put, getAll;
 	TextArea textField = new TextArea(20, 80);
 	TextArea textField1 = new TextArea(30, 80);
-	TextArea textField2 = new TextArea(25, 90);
+	public static TextArea textField2 = new TextArea(25, 90);
 	CardLayout cardLO;
-	Button back, back1,execute,execute1;
+	Button back, back1, execute, execute1;
 	Label key, value, labelSelect;
 	TextField field0, field1;
 	CheckboxGroup group;
@@ -42,6 +49,9 @@ public class AppFrame extends Frame implements ActionListener, ItemListener {
 	Panel mainPanel = new Panel();
 	Panel getAndPut = new Panel();
 	Panel getAlls = new Panel();
+	// ----create--panels-----------------------------------
+
+	
 
 	public AppFrame(String title) {
 		super(title);
@@ -73,7 +83,7 @@ public class AppFrame extends Frame implements ActionListener, ItemListener {
 		back1.addActionListener(this);
 		execute = new Button("execute");
 		execute1 = new Button("execute");
-		
+
 		labelSelect = new Label("Selected methods");
 		key = new Label("Key", Label.LEFT);
 		value = new Label("Value", Label.LEFT);
@@ -90,35 +100,33 @@ public class AppFrame extends Frame implements ActionListener, ItemListener {
 		get.addItemListener(this);
 		put.addItemListener(this);
 		getAll.addItemListener(this);
-		
+
 		GridBagLayout gBag = new GridBagLayout();
 		GridBagConstraints gConstraint = new GridBagConstraints();
-		
-		//------set--layout--mainPanel---------------------------
-		
+
+		// ------set--layout--mainPanel---------------------------
 		mainPanel.setLayout(gBag);
 		gConstraint.fill = GridBagConstraints.HORIZONTAL;
 		gConstraint.gridwidth = 1;
 		gConstraint.gridx = 0;
 		gConstraint.gridy = 0;
-		mainPanel.add(get,gConstraint);
+		mainPanel.add(get, gConstraint);
 		gConstraint.gridwidth = 1;
 		gConstraint.gridx = 1;
 		gConstraint.gridy = 0;
-		mainPanel.add(put,gConstraint);
+		mainPanel.add(put, gConstraint);
 		gConstraint.gridwidth = 1;
 		gConstraint.gridx = 2;
 		gConstraint.gridy = 0;
-		mainPanel.add(getAll,gConstraint);
+		mainPanel.add(getAll, gConstraint);
 		gConstraint.gridwidth = GridBagConstraints.REMAINDER;
 		gConstraint.gridx = 0;
 		gConstraint.gridy = 1;
-		mainPanel.add(textField2,gConstraint);
-		
-		//------set--layout--mainPanel---------------------------
-		
+		mainPanel.add(textField2, gConstraint);
+		// ------set--layout--mainPanel---------------------------
+
 		// --------------set--layout--getAndPut------
-		
+
 		getAndPut.setLayout(gBag);
 
 		gConstraint.anchor = GridBagConstraints.CENTER;
@@ -147,7 +155,7 @@ public class AppFrame extends Frame implements ActionListener, ItemListener {
 		gConstraint.gridx = 0;
 		gConstraint.gridy = 2;
 		getAndPut.add(execute1, gConstraint);
-		
+
 		gConstraint.gridx = 0;
 		gConstraint.gridy = 3;
 		getAndPut.add(textField, gConstraint);
@@ -160,11 +168,11 @@ public class AppFrame extends Frame implements ActionListener, ItemListener {
 
 		// --------------set--layout--getAll------
 		getAlls.setLayout(gBag);
-		
+
 		gConstraint.gridx = 0;
 		gConstraint.gridy = 0;
 		getAlls.add(execute, gConstraint);
-		
+
 		gConstraint.gridx = 0;
 		gConstraint.gridy = 1;
 		getAlls.add(textField1, gConstraint);
@@ -179,13 +187,13 @@ public class AppFrame extends Frame implements ActionListener, ItemListener {
 		panels.add(mainPanel, "this");
 		panels.add(getAndPut, "getAndPut");
 		panels.add(getAlls, "getAlls");
-	
+
 		add(panels);
 	}
 
 	@Override
 	public void paint(Graphics g) {
-		
+
 	}
 
 	@Override
