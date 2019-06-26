@@ -19,10 +19,21 @@ public class MenuHandler implements ActionListener {
 			fileDialog = new FileDialog(appFrame, "Open ignite config", FileDialog.LOAD);
 			fileDialog.setVisible(true);
 			String configPath = fileDialog.getDirectory() + fileDialog.getFile();
-			
-		} else if (e.getActionCommand().equals("Exit"))
+
+		} else if (e.getActionCommand().equals("CleanTextField")) {
+
+			appFrame.textArea.selectAll();
+			appFrame.textArea.setText("");
+			appFrame.textArea1.selectAll();
+			appFrame.textArea1.setText("");
+			appFrame.textArea2.selectAll();
+			appFrame.textArea2.setText("");
+
+		} else if (e.getActionCommand().equals("Exit")) {
 			System.exit(0);
 			appFrame.repaint();
+		}
+
 	}
 
 }

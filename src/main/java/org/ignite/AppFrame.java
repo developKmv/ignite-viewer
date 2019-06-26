@@ -27,23 +27,33 @@ import java.io.BufferedOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.StringWriter;
+import java.util.List;
+
+import javax.cache.Cache;
+import javax.cache.Cache.Entry;
 
 import org.apache.ignite.Ignite;
 import org.apache.ignite.Ignition;
+import org.apache.ignite.cache.query.QueryCursor;
+import org.apache.ignite.cache.query.ScanQuery;
+import org.apache.ignite.client.ClientCache;
+import org.apache.ignite.client.IgniteClient;
+import org.apache.ignite.configuration.ClientConfiguration;
 
 public class AppFrame extends Frame implements ActionListener, ItemListener {
 
 	public static String configpath = "";
 	Checkbox get, put, getAll;
-	TextArea textField = new TextArea(20, 80);
-	TextArea textField1 = new TextArea(30, 80);
-	public static TextArea textField2 = new TextArea(25, 90);
+	TextArea textArea = new TextArea(20, 80);
+	TextArea textArea1 = new TextArea(30, 80);
+	TextArea textArea2 = new TextArea(25, 90);
 	CardLayout cardLO;
 	Button back, back1, execute, execute1;
 	Label key, value, labelSelect;
 	TextField field0, field1;
 	CheckboxGroup group;
-
+	String field0Str;
+	String field1Str;
 	// ----create--panels-----------------------------------
 	Panel panels;
 	Panel mainPanel = new Panel();
@@ -51,20 +61,29 @@ public class AppFrame extends Frame implements ActionListener, ItemListener {
 	Panel getAlls = new Panel();
 	// ----create--panels-----------------------------------
 
-	
+	// -----ignite--block------------------------------------
+	IgniteClient igniteClient;
+	ClientCache<Object, Object> cache;
+	// -----ignite--block------------------------------------
 
-	public AppFrame(String title) {
-		super(title);
+	public AppFrame(String title, IgniteClient igniteClient) {
+
+		this.igniteClient = igniteClient;
+		cache = igniteClient.getOrCreateCache("TestCache");
+
+		setTitle(title);
+
 		panels = new Panel();
 
 		// -------create--menu-------------------------------
 		MenuBar mbar = new MenuBar();
 		setMenuBar(mbar);
 		Menu menu = new Menu("Menu");
-		MenuItem item1, item2;
+		MenuItem item1, item2, item3;
 
 		menu.add(item1 = new MenuItem("Open ignite config"));
-		menu.add(item2 = new MenuItem("Exit"));
+		menu.add(item2 = new MenuItem("CleanTextField"));
+		menu.add(item3 = new MenuItem("Exit"));
 		mbar.add(menu);
 		// -------create--menu-------------------------------
 
@@ -73,16 +92,22 @@ public class AppFrame extends Frame implements ActionListener, ItemListener {
 		MenuHandler menuHandler = new MenuHandler(this);
 		item1.addActionListener(menuHandler);
 		item2.addActionListener(menuHandler);
+		item3.addActionListener(menuHandler);
 		// -------create-listener------------------------------
 
 		// -------elements---------------------------------
 
 		back = new Button("Back");
 		back.addActionListener(this);
+
 		back1 = new Button("Back");
 		back1.addActionListener(this);
+
 		execute = new Button("execute");
+		execute.addActionListener(this);
+
 		execute1 = new Button("execute");
+		execute1.addActionListener(this);
 
 		labelSelect = new Label("Selected methods");
 		key = new Label("Key", Label.LEFT);
@@ -90,6 +115,8 @@ public class AppFrame extends Frame implements ActionListener, ItemListener {
 
 		field0 = new TextField(10);
 		field1 = new TextField(10);
+		field0.addActionListener(this);
+		field1.addActionListener(this);
 
 		group = new CheckboxGroup();
 
@@ -122,7 +149,7 @@ public class AppFrame extends Frame implements ActionListener, ItemListener {
 		gConstraint.gridwidth = GridBagConstraints.REMAINDER;
 		gConstraint.gridx = 0;
 		gConstraint.gridy = 1;
-		mainPanel.add(textField2, gConstraint);
+		mainPanel.add(textArea2, gConstraint);
 		// ------set--layout--mainPanel---------------------------
 
 		// --------------set--layout--getAndPut------
@@ -158,7 +185,7 @@ public class AppFrame extends Frame implements ActionListener, ItemListener {
 
 		gConstraint.gridx = 0;
 		gConstraint.gridy = 3;
-		getAndPut.add(textField, gConstraint);
+		getAndPut.add(textArea, gConstraint);
 
 		gConstraint.gridx = 0;
 		gConstraint.gridy = 4;
@@ -175,7 +202,7 @@ public class AppFrame extends Frame implements ActionListener, ItemListener {
 
 		gConstraint.gridx = 0;
 		gConstraint.gridy = 1;
-		getAlls.add(textField1, gConstraint);
+		getAlls.add(textArea1, gConstraint);
 
 		gConstraint.gridx = 0;
 		gConstraint.gridy = 2;
@@ -201,8 +228,24 @@ public class AppFrame extends Frame implements ActionListener, ItemListener {
 
 		if (e.getActionCommand().equals("Back")) {
 			cardLO.show(panels, "this");
-		}
+		} else if (e.getActionCommand().equals("execute")) {
+			switch (group.getSelectedCheckbox().getLabel()) {
+			case "Get":
+				System.out.println(cache.get(field0.getText()).toString());
+				break;
+			case "Put":
+				cache.put(field0.getText(), field1.getText());
+				System.out.println("PUT IS DONE");
+				break;
+			case "GetALL":
+				QueryCursor<Cache.Entry<Object, Object>> cursor = cache.query(new ScanQuery());
+				List<Entry<Object, Object>> listQuery= cursor.getAll();
+				listQuery.forEach(obj -> System.out.println("Value " + obj.getValue()));
+				break;
+			}
 
+		}
+		
 	}
 
 	@Override
